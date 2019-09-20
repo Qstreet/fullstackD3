@@ -1,8 +1,6 @@
 async function drawLineChart() {
-  // console.log('Hey Chart');
-
+  
   const dataset = await d3.json('./fullstackD3/my_weather_data.json')
-  // console.log(dataset);
 
   // ACCESSOR fn  convert single data pt into a value
   const yAccessor = d => d.temperatureMax
