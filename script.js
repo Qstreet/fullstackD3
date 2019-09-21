@@ -6,12 +6,12 @@ async function drawLineChart() {
 
   // gridlines in x axis function
   function make_x_gridlines() {
-    return xAxisGenerator.ticks(5)
+    return xAxisGenerator.ticks(7)
   }
 
   // gridlines in y axis function
   function make_y_gridlines() {
-    return yAxisGenerator.ticks(5)
+    return yAxisGenerator.ticks(10)
   }
 
   const dataset = await d3.csv('./KenyaRates1998on.csv', function (d) {
@@ -33,6 +33,7 @@ async function drawLineChart() {
 
   // ACCESSOR fn  convert single data pt into a value
   const yAccessor = d => d.exchTo1USD
+  const yAccessorUK = d => d.mean
   // accessor fn so that xAccessor(dataset[0]) returns first day date
   // REMEMBER: accessor fns return an unscaled value 
   const xAccessor = d => d.date
@@ -44,7 +45,7 @@ async function drawLineChart() {
     margin: {
       top: 15,
       right: 15,
-      bottom: 40,
+      bottom: 50,
       left: 60
     }
   }
@@ -62,7 +63,9 @@ async function drawLineChart() {
 
 
   const yScale = d3.scaleLinear()
-    .domain(d3.extent(dataset, yAccessor))
+    // .domain(d3.extent(dataset, yAccessor))
+    // .domain([d3.min(dataset, yAccessor), d3.max(datasetUK, yAccessorUK)])
+    .domain([55, d3.max(datasetUK, yAccessorUK)])
     .range([dimensions.boundedHeight, 0])
     .nice()
 
@@ -70,8 +73,6 @@ async function drawLineChart() {
     .domain(d3.extent(dataset, xAccessor))
     .range([0, dimensions.boundedWidth])
     .nice()
-
-
 
 
 
@@ -111,6 +112,10 @@ async function drawLineChart() {
     )
 
 
+  const lineGenerator2 = d3.line()
+    .x(d => xScale(xAccessor(d)))
+    .y(d => yScale(yAccessorUK(d)))
+
   const lineGenerator = d3.line()
     .x(d => xScale(xAccessor(d)))
     .y(d => yScale(yAccessor(d)))
@@ -118,8 +123,14 @@ async function drawLineChart() {
   const line = bounds.append('path')
     .attr('d', lineGenerator(dataset))
     .attr('fill', 'none')
-    .attr('stroke', '#af9358')
-    .attr('stroke-width', 1)
+    .attr('stroke', 'blue')
+    .attr('stroke-width', 0.5)
+
+  const line2 = bounds.append('path')
+    .attr('d', lineGenerator2(datasetUK))
+    .attr('fill', 'none')
+    .attr('stroke', 'red')
+    .attr('stroke-width', 0.5)
 
   // add a title
   bounds.append("text")
@@ -135,7 +146,7 @@ async function drawLineChart() {
     .attr('y', dimensions.margin.bottom - 5)
     .attr('fill', 'black')
     .style('font-size', '1.4em')
-    .html("Daily Average: 1998 to Current")
+    .html("November 2004 to Current")
 
   const yAxisLabel = yAxis.append('text')
     .attr('x', -dimensions.boundedHeight / 2)
