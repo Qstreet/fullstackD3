@@ -139,7 +139,7 @@ async function drawLineChart() {
     .attr("text-anchor", "middle")
     .style("font-size", "20px")
     .style("text-decoration", "none")
-    .text("Kenya Shilling : 1 US Dollar Exchange");
+    .text("Kenya Shilling Exchange : USD and UK Pound ");
 
   const xAxisLabel = xAxis.append('text')
     .attr('x', dimensions.boundedWidth / 2)
