@@ -62,6 +62,7 @@ async function drawLineChart() {
     .style('transform', `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`)
 
 
+    // SCALES
   const yScale = d3.scaleLinear()
     // .domain(d3.extent(dataset, yAccessor))
     // .domain([d3.min(dataset, yAccessor), d3.max(datasetUK, yAccessorUK)])
