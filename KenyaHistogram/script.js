@@ -1,21 +1,55 @@
 async function drawDataViz() {
 
+  // Create parsers to convert dates in ACLED string format into javascript Date object and back into string as needed.
   const dateParser = d3.timeParse('%Y-%m-%d')
   const dateFormat = d3.timeFormat('%Y-%m-%d')
 
-  // Get most recent date and subtrack 90 days
+  // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
+
+  // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent ACLED entry
+  // use &limit=1 to return only one record
   const oneRecord = "https://api.acleddata.com/acled/read?terms=accept&limit=1"
 
+  // call ACLED api for one record. I am using d3.js but any RESTful HTTP api will work.
   const oneRecordJson = await d3.json(oneRecord)
-  const latestDate = dateParser(oneRecordJson.data[0].event_date)
-  const subtractTime = new Date(latestDate.setDate(latestDate.getDate() - 180))
+
+  // scrape JSON for date and parse string into javascript Date object
+  const latestDateJS = dateParser(oneRecordJson.data[0].event_date)
+
+  // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
+  // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 180))
+
+  // convert earlier date into string object to insert into actual URL string
   const earliestDate = dateFormat(subtractTime)
 
-  const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=231&event_type=Protests&event_type=Riots&last_event_date=${earliestDate}|${latestDate}&last_event_date_where=BETWEEN`
+  // put latestDate back into string
+  // const latestDate = dateFormat(latestDateJS)
+  latestDate = oneRecordJson.data[0].event_date
+
+
+  // pick country by ISO list. 404 happens to be Kenya
+  const countryISO = 404
+
+  // call ACLED api. Here we are getting all Riots and Protests in Kenya from the latest entry to 180 days back.
+  // it seems that you must put the early date first and recent date second
+
+
+  // const j = `https://api.acleddata.com/acled/read?terms=accept&iso=404&event_type=Protests&event_type=Riots&event_date=${earliestDate}console.log(j);
+
+
+// this is the actual string which gets sent to ACLED
+
+const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests&event_type=Riots&event_date=2018-01-01|2019-09-14&event_date_where=BETWEEN`
 
   const accessor01 = d => d.admin1
 
-  const dataJson = await d3.json(jsonData)
+const jd = function() {
+  const str = "https://api.acleddata.com/acled/read?terms=accept&iso="+countryISO+"&event_type=Protests&event_type=Riots&event_date="+earliestDate+"%7C"+latestDate+"&event_date_where=BETWEEN"
+  return str
+}
+
+  const dataJson = await d3.json(jd())
   const dataset = dataJson.data
 
   let datasetByAdmin1 = d3.nest()
@@ -24,8 +58,18 @@ async function drawDataViz() {
     .rollup(function (v) { return v.length })
     .entries(dataset)
 
+
+
   // get max value for Y scale
   const maxY = datasetByAdmin1.reduce((max, p) => p.value > max ? p.value : max, datasetByAdmin1[0].value)
+
+  // const maxY = datasetByAdmin1.reduce(function(max, p) {
+  //   if (p.value > max) {
+  //     return p.value
+  //   } else {
+  //     return max, datasetByAdmin1[0].value
+  //   }
+  // })
 
   // for histrogram which should be 2x as wide as tall
   let dimensions = {
