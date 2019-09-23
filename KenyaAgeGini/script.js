@@ -63,8 +63,6 @@ async function drawScatterPlot() {
     .nice()
 
 
-
-
   // AXES
   const xAxisGenerator = d3.axisBottom().scale(xScale)
   const yAxisGenerator = d3.axisLeft().scale(yScale)
