@@ -18,7 +18,7 @@ async function drawDataViz() {
 
   // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
   // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
-  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 180))
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 730))
 
   // convert earlier date into string object to insert into actual URL string
   const earliestDate = dateFormat(subtractTime)
@@ -29,7 +29,9 @@ async function drawDataViz() {
 
 
   // pick country by ISO list. 404 happens to be Kenya
-  const countryISO = 404
+  const countryISO = 12
+  const dateRange = earliestDate + "|" + latestDate
+  console.log(dateRange);
 
   // call ACLED api. Here we are getting all Riots and Protests in Kenya from the latest entry to 180 days back.
   // it seems that you must put the early date first and recent date second
@@ -38,18 +40,16 @@ async function drawDataViz() {
   // const j = `https://api.acleddata.com/acled/read?terms=accept&iso=404&event_type=Protests&event_type=Riots&event_date=${earliestDate}console.log(j);
 
 
-// this is the actual string which gets sent to ACLED
+  // this is the actual string which gets sent to ACLED
 
-const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests&event_type=Riots&event_date=2018-01-01|2019-09-14&event_date_where=BETWEEN`
+  const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
+
+  // const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests&event_type=Riots&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
 
   const accessor01 = d => d.admin1
 
-const jd = function() {
-  const str = "https://api.acleddata.com/acled/read?terms=accept&iso="+countryISO+"&event_type=Protests&event_type=Riots&event_date="+earliestDate+"%7C"+latestDate+"&event_date_where=BETWEEN"
-  return str
-}
 
-  const dataJson = await d3.json(jd())
+  const dataJson = await d3.json(jsonData)
   const dataset = dataJson.data
 
   let datasetByAdmin1 = d3.nest()
