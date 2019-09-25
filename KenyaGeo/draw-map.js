@@ -30,7 +30,7 @@ async function drawDataViz() {
             right: 10,
             bottom: 10,
             left: 10
-        },
+        }
     }
     dimensions.boundedWidth = dimensions.width - dimensions.margin.left - dimensions.margin.right
 
@@ -55,17 +55,50 @@ async function drawDataViz() {
 
     const wrapper = d3.select('#wrapper')
         .append('svg')
-        .attr('width', dimensions.width)
+        .attr('width',  dimensions.width)
         .attr('height', dimensions.height)
 
     const bounds = wrapper.append('g')
         .style('transform', `translate(${dimensions.margin.left}px,
             ${dimensions.margin.top}px)`)
 
+    // get array of object values
+    const metricValues = Object.values(metricDataByCountry)
 
-    console.log(bounds);
+    // get smallest and largest values
+    const metricValueExtent = d3.extent(metricValues)
 
+    // piecewise scale with middle value
+    const maxChange = d3.max([-metricValueExtent[0], metricValueExtent[1]])
 
+    const colorScale = d3.scaleLinear()
+        .domain([-maxChange, 0, maxChange])
+        .range(["indigo", "white", "darkgreen"])
+
+    // call pathGenerator to draw sphere (earth)
+    const earth = bounds.append('path')
+        .attr('class', 'earth')
+        .attr('d', pathGenerator(sphere))
+
+    // Graticule
+    const graticuleJson = d3.geoGraticule10()
+
+    const graticule = bounds.append('path')
+        .attr('class', 'graticule')
+        .attr('d', pathGenerator(graticuleJson))
+
+    const countries = bounds.selectAll('.country')
+        .data(countryShapes.features)
+        .enter().append('path')
+        .attr('class', 'country')
+        .attr('d', pathGenerator)  // same as 'd',d => pathGenerator(d)
+        .attr('fill', d => {
+            const metricValue = metricDataByCountry[countryIdAccessor(d)]
+            if (typeof metricValue === "undefined") {
+                 return "#e2e6e9"
+            }
+            return colorScale(metricValue)
+        })
 
     // "Series Name": "Population growth (annual %)"
 
