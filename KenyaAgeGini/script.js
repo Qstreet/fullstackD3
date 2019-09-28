@@ -96,8 +96,6 @@ async function drawScatterPlot() {
     .domain(d3.extent(dataset, yAccessor))
     .range(["black", "teal"])
 
-
-
   const dots = bounds.selectAll('circle')
     .data(dataset)
     .enter()
