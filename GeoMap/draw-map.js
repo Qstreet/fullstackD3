@@ -1,4 +1,5 @@
 async function drawDataViz() {
+
   // IMPORT GeoJSON map data  
   const countryShapes = await d3.json('./ne_50m_admin_0_countries/world-geojson2.json')
 
@@ -27,10 +28,10 @@ async function drawDataViz() {
   let dimensions = {
     width: d3.min([900, window.innerWidth * 0.9]),
     margin: {
-      top: 10,
-      right: 40,
+      top:    10,
+      right:  40,
       bottom: 40,
-      left: 40
+      left:   40
     }
   }
   dimensions.boundedWidth = dimensions.width - dimensions.margin.left - dimensions.margin.right
@@ -162,14 +163,27 @@ async function drawDataViz() {
   function onMouseEnter(datum) {
     tooltip.style('opacity', 1)
     const metricValue = metricDataByCountry[countryIdAccessor(datum)]
-    tooltip.select('#country').text(countryNameAccessor(datum))
-    tooltip.select('#value').text(`${d3.format(',.2f')(metricValue || 0)}%`)
+
+    tooltip.select('#country')
+      .text(countryNameAccessor(datum))
+
+    tooltip.select('#value')
+      .text(`${d3.format(",.2f")(metricValue || 0)}%`)
+
+      console.log(pathGenerator.centroid(datum));
 
     const [centerX, centerY] = pathGenerator.centroid(datum)
     const x = centerX + dimensions.margin.left
     const y = centerY + dimensions.margin.top
 
-    tooltip.style('transform', `translate(calc(-50% + ${x}px), calc(-100% + ${y}px))`)
+    // tooltip.attr("transform", `translate(`
+    //   + `calc( -50% + ${x}px),`
+    //   + `calc(-100% + ${y}px)`
+    //   + `)`)    
+  
+  tooltip
+    .style('transform', `translate(calc( -50% + ${x}px), calc( -100% + ${y}px))`)
+
   }
 
   function onMouseLeave() {
@@ -181,11 +195,7 @@ drawDataViz()
 
 /*
 404: Object { 'Country Name': 'Kenya', 'Country Code': 'KEN', 'Series Name': 'International tourism, receipts (current US$)', … }
-
 405: Object { 'Country Name': 'Kenya', 'Country Code': 'KEN', 'Series Name': 'Net migration', … }
-
 406: Object { 'Country Name': 'Kenya', 'Country Code': 'KEN', 'Series Name': 'Population growth (annual %)', … }
-
 407: Object { 'Country Name': 'Kenya', 'Country Code': 'KEN', 'Series Name': 'Population density (people per sq. km of land area)', … }
-
 */
