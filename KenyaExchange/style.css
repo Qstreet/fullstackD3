@@ -1,11 +1,23 @@
-svg {background-color: aliceblue}
+/* svg {background-color: aliceblue} */
 
 .grid line {
   stroke: lightgrey;
-  stroke-opacity: 0.5;
+  stroke-opacity: 1.0;
   shape-rendering: crispEdges;
 }
 
 .grid path {
   stroke-width: 0;
 }
+
+.timelineLable {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: red;
+}
+
+/* .area {
+  fill: lightpink;
+  stroke-width: 0;
+} */

@@ -11,6 +11,11 @@ async function drawScatterPlot() {
   const yAccessor = d => d.medianAge
   const xAccessor = d => d.gini
 
+  // TRANSITION
+  const t = d3.transition()
+    .duration(500)
+    .ease(d3.easeLinear);
+
   // gridlines in x axis function
   function make_x_gridlines() {
     return xAxisGenerator.ticks(7)
@@ -96,14 +101,47 @@ async function drawScatterPlot() {
     .domain(d3.extent(dataset, yAccessor))
     .range(["black", "teal"])
 
+function drawDotsWave(dataset) {
+
   const dots = bounds.selectAll('circle')
     .data(dataset)
-    .enter()
-    .append('circle')
+    // .enter()
+    // .append('circle')
+    dots.join('circle')
     .attr('cx', d => xScale(xAccessor(d)))
     .attr('cy', d => yScale(yAccessor(d)))
     .attr('r', 5)
-    .attr('fill', d => colorScale(xAccessor(d)))
+    .attr('fill','red')
+    .transition(t)
+    .style('fill', d => colorScale(xAccessor(d)))
+
+}
+
+setTimeout(() => {
+  drawDotsWave(dataset.slice(0, dataset.length)
+)},1000)
+
+console.log(dataset.length);
+
+// function drawDots(dataset, color) {
+//   const dots = bounds.selectAll('circle').data(dataset)
+
+//   dots
+//     // .enter().append('circle')
+//     // .merge(dots)
+//     .join('circle')
+//     .attr('cx', d => xScale(xAccessor(d)))
+//     .attr('cy', d => yScale(yAccessor(d)))
+//     .attr('r',5)
+//     .attr('fill', color)
+
+// }
+// drawDots(dataset.slice(0,10), 'darkgrey')
+
+// setTimeout(() => {
+//   drawDots(dataset, "cornflowerblue")
+// },3500)
+
 
   // LABLES
   const xAxisLable = xAxis.append('text')
