@@ -2,6 +2,7 @@ async function drawDataViz() {
 
   // IMPORT GeoJSON map data  
   const countryShapes = await d3.json('./ne_50m_admin_0_countries/world-geojson2.json')
+  // const countryShapes = await d3.json('./ne_50m_admin_0_countries/ne_50_admin_0-ATA.json')
 
   // ACCESSOR FUNCTIONS
   const countryNameAccessor = d => d.properties['NAME']
@@ -40,7 +41,7 @@ async function drawDataViz() {
   // sphere is a GeoJSON obj like point, multipoint. Sphere has no coordinates
   //  globe projection might be d3.geoTransverseMercator()
   const sphere = ({ type: 'Sphere' })
-  const projection = d3.geoEqualEarth().fitWidth(dimensions.boundedWidth, sphere)
+  const projection = d3.geoOrthographic().fitWidth(dimensions.boundedWidth, sphere).scale(400)
   // const projection = d3.geoTransverseMercator().fitWidth(dimensions.boundedWidth, sphere)
   // pathGenerator acts here as a scale converting a GeoJSON obj into a <path> d string
   const pathGenerator = d3.geoPath(projection)
@@ -162,6 +163,7 @@ async function drawDataViz() {
 
   function onMouseEnter(datum) {
     tooltip.style('opacity', 1)
+
     const metricValue = metricDataByCountry[countryIdAccessor(datum)]
 
     tooltip.select('#country')
@@ -170,29 +172,18 @@ async function drawDataViz() {
     tooltip.select('#value')
       .text(`${d3.format(",.2f")(metricValue || 0)}%`)
 
-      console.log(pathGenerator.centroid(datum));
-
     const [centerX, centerY] = pathGenerator.centroid(datum)
     const x = centerX + dimensions.margin.left
     const y = centerY + dimensions.margin.top
 
-    // tooltip.attr("transform", `translate(`
-    //   + `calc( -50% + ${x}px),`
-    //   + `calc(-100% + ${y}px)`
-    //   + `)`)    
-  
   tooltip
     .style('transform', `translate(calc( -50% + ${x}px), calc( -100% + ${y}px))`)
-
   }
 
   function onMouseLeave() {
     tooltip.style('opacity', 0)
   }
 } // close wrapping fn
-
-
-
 
 drawDataViz()
 

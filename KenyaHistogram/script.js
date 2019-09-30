@@ -20,7 +20,7 @@ async function drawDataViz() {
 
   // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
   // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
-  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 90))
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 180))
 
   // convert earlier date into string object to insert into actual URL string
   const earliestDate = dateFormat(subtractTime)
