@@ -120,7 +120,7 @@ async function drawScatterPlot() {
       .style('fill', d => colorScale(xAccessor(d)))
       .on("mouseover", function (d) {
         div
-        .attr("class", "tooltip")
+        .attr("class", "tooltip-big")
         .transition()
           .duration(200)
           .style("opacity", .9);

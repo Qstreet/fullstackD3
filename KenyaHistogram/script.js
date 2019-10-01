@@ -3,8 +3,8 @@ async function drawDataViz() {
   // Create parsers to convert dates in ACLED string format into javascript Date object and back into string as needed.
   const dateParser = d3.timeParse('%Y-%m-%d')
   const dateFormat = d3.timeFormat('%Y-%m-%d')
-    // pick country by ISO list. 404 happens to be Kenya
-  const countryISO = 404
+  // pick country by ISO list. 404 happens to be Kenya
+  const countryISO = '404'
   // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
 
   // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent single ACLED entry for that criteria
@@ -55,6 +55,7 @@ async function drawDataViz() {
 
   const dataJson = await d3.json(jsonData)
   const dataset = dataJson.data
+  const countryAccessor = dataset[0].country
 
   let datasetByAdmin1 = d3.nest()
     .key(function (d) { return d.admin1 })
@@ -114,10 +115,10 @@ async function drawDataViz() {
     .attr('fill', 'steelblue')
 
   // AXES
-// trick here was to put .ticks(maxY) so the axes adjusts each render. Otherwise it renders 1, 1.5, 2, 2.5 ... 
+  // trick here was to put .ticks(maxY) so the axes adjusts each render. Otherwise it renders 1, 1.5, 2, 2.5 ... 
   const xAxisGenerator = d3.axisBottom().scale(xScale)
   const yAxisGenerator = d3.axisLeft().ticks(maxY).tickFormat(d3.format("d")).scale(yScale)
-  
+
 
   // Rotate X Axes lables
   // Add the X Axis
@@ -135,6 +136,13 @@ async function drawDataViz() {
 
   const yAxis = bounds.append('g')
     .call(yAxisGenerator)
+
+  bounds.append('text')
+    .attr('x', dimensions.width / 2)
+    .attr('y', 8)
+    .text(`${countryAccessor}: ${earliestDate} to ${latestDate}`)
+    .attr('class', "dateText")
+    .attr('text-anchor', 'middle')
 
 }
 

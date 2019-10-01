@@ -2,6 +2,7 @@ async function drawLineChart() {
   // TIME PARSE and X ACCESSOR
   const dateParser = d3.timeParse("%b-%d-%Y");
   const dateParserUK = d3.timeParse("%d/%m/%Y");
+  const timeFormatUK = d3.timeFormat("%b %d, %Y")
 
   // gridlines in x axis function
   function make_x_gridlines() {
@@ -17,7 +18,7 @@ async function drawLineChart() {
     return {
       date: dateParser(d.Date),
       exchTo1USD: +d.exchTo1USD
-    };
+    }
   });
 
   // Second line data
@@ -25,10 +26,8 @@ async function drawLineChart() {
     return {
       date: dateParserUK(d.Date),
       mean: +d.Mean
-    };
-  });
-
-  console.log(datasetUK);
+    }
+  })
 
   // ACCESSOR fn  convert single data pt into a value
   const yAccessor = dataset => dataset.exchTo1USD;
@@ -44,7 +43,7 @@ async function drawLineChart() {
     height: window.innerHeight * 0.5,
     margin: {
       top: 35,
-      right: 15,
+      right: 35,
       bottom: 50,
       left: 60
     }
@@ -170,12 +169,28 @@ async function drawLineChart() {
     .attr("stroke", "blue")
     .attr("stroke-width", 0.5);
 
+  bounds.append("text")
+    .attr("transform", "translate(" + (dimensions.boundedWidth + 3) + "," + yScaleUS(dataset[0].exchTo1USD) + ")")
+    .attr("dy", ".35em")
+    .attr("text-anchor", "start")
+    .style("fill", "blue")
+    .text("US$");
+
+
   const line2 = bounds
     .append("path")
     .attr("d", lineGenerator2(datasetUK))
     .attr("fill", "none")
     .attr("stroke", "red")
-    .attr("stroke-width", 0.5);
+    .attr("stroke-width", 0.5)
+
+  bounds.append("text")
+    .attr("transform", "translate(" + (dimensions.boundedWidth + 3) + "," + yScaleUK(datasetUK[0].mean) + ")")
+    .attr("dy", ".35em")
+    .attr("text-anchor", "start")
+    .style("fill", "red")
+    .text("UK£");
+
 
   // add a title
   bounds
