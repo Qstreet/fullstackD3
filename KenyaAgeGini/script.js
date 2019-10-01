@@ -11,6 +11,12 @@ async function drawScatterPlot() {
   const yAccessor = d => d.medianAge
   const xAccessor = d => d.gini
 
+  // TOOLTIP
+  // var formatTime = d3.timeFormat("%e %B");
+  let div = d3.select("body").append("div")
+    // .attr("class", "tooltip")
+    .style("opacity", 0);
+
   // TRANSITION
   const t = d3.transition()
     .duration(500)
@@ -101,46 +107,60 @@ async function drawScatterPlot() {
     .domain(d3.extent(dataset, yAccessor))
     .range(["black", "teal"])
 
-function drawDotsWave(dataset) {
+  function drawDotsWave(dataset) {
 
-  const dots = bounds.selectAll('circle')
-    .data(dataset)
+    const dots = bounds.selectAll('circle')
+      .data(dataset)
     // .enter()
     // .append('circle')
     dots.join('circle')
-    .attr('cx', d => xScale(xAccessor(d)))
-    .attr('cy', d => yScale(yAccessor(d)))
-    .attr('r', 5)
-    .attr('fill','red')
-    .transition(t)
-    .style('fill', d => colorScale(xAccessor(d)))
+      .attr('cx', d => xScale(xAccessor(d)))
+      .attr('cy', d => yScale(yAccessor(d)))
+      .attr('r', 5)
+      .style('fill', d => colorScale(xAccessor(d)))
+      .on("mouseover", function (d) {
+        div
+        .attr("class", "tooltip")
+        .transition()
+          .duration(200)
+          .style("opacity", .9);
+        div.html(`${d.country} <br/> Age: ${d.medianAge} <br/> Gini: ${d.gini}`)
+          .style("left", (d3.event.pageX + 8) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (d) {
+        div.transition()
+          .duration(1000)
+          .style("opacity", 0);
+      });
 
-}
+  }
 
-setTimeout(() => {
-  drawDotsWave(dataset.slice(0, dataset.length)
-)},1000)
+  setTimeout(() => {
+    drawDotsWave(dataset.slice(0, dataset.length)
+    )
+  }, 1000)
 
-console.log(dataset.length);
+  console.log(dataset.length);
 
-// function drawDots(dataset, color) {
-//   const dots = bounds.selectAll('circle').data(dataset)
+  // function drawDots(dataset, color) {
+  //   const dots = bounds.selectAll('circle').data(dataset)
 
-//   dots
-//     // .enter().append('circle')
-//     // .merge(dots)
-//     .join('circle')
-//     .attr('cx', d => xScale(xAccessor(d)))
-//     .attr('cy', d => yScale(yAccessor(d)))
-//     .attr('r',5)
-//     .attr('fill', color)
+  //   dots
+  //     // .enter().append('circle')
+  //     // .merge(dots)
+  //     .join('circle')
+  //     .attr('cx', d => xScale(xAccessor(d)))
+  //     .attr('cy', d => yScale(yAccessor(d)))
+  //     .attr('r',5)
+  //     .attr('fill', color)
 
-// }
-// drawDots(dataset.slice(0,10), 'darkgrey')
+  // }
+  // drawDots(dataset.slice(0,10), 'darkgrey')
 
-// setTimeout(() => {
-//   drawDots(dataset, "cornflowerblue")
-// },3500)
+  // setTimeout(() => {
+  //   drawDots(dataset, "cornflowerblue")
+  // },3500)
 
 
   // LABLES

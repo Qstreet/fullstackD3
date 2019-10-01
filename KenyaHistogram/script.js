@@ -67,7 +67,7 @@ async function drawDataViz() {
 
   // for histrogram which should be 2x as wide as tall
   let dimensions = {
-    width: window.innerWidth * 0.95,
+    width: window.innerWidth * 0.9,
     height: window.innerWidth * 0.5,
     margin: {
       top: 15,

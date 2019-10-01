@@ -6,18 +6,18 @@ Botswana,24.9,60.5
 Burkina Faso,17.4,39.5
 Burundi,17.1,42.4
 Cameroon,18.6,46.5
-Central African Republic,19.8,43.6
+CAR,19.8,43.6
 Chad,15.8,43.3
 Comoros,20.2,55.9
-"Congo, Democratic Republic of the",18.8,42.1
-"Congo, Republic of the",19.6,48.9
+DRC,18.8,42.1
+Republic Congo,19.6,48.9
 Cote d'Ivoire,19.9,41.5
 Djibouti,24.2,40.9
 Egypt,23.9,31.8
 Eswatini,23.2,50.4
 Ethiopia,18,33
 Gabon,20.5,42.2
-"Gambia, The",21.3,50.2
+Gambia, The",21.3,50.2
 Guinea,19,39.4
 Kenya,20,48.5
 Lesotho,24.4,63.2
@@ -33,7 +33,7 @@ Namibia,21.4,59.7
 Niger,15.5,34
 Nigeria,18.3,48.8
 Rwanda,19.2,50.4
-Sao Tome and Principe,18.7,30.8
+Sao Tome & Principe,18.7,30.8
 Senegal,19,40.3
 Seychelles,35.8,46.8
 Sierra Leone,19.1,34
