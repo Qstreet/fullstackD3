@@ -4,7 +4,7 @@ async function drawDataViz() {
   const dateParser = d3.timeParse('%Y-%m-%d')
   const dateFormat = d3.timeFormat('%Y-%m-%d')
   // pick country by ISO list. 404 happens to be Kenya
-  const countryISO = '404'
+  const countryISO = '180'
   // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
 
   // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent single ACLED entry for that criteria
@@ -20,7 +20,7 @@ async function drawDataViz() {
 
   // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
   // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
-  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 180))
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 14))
 
   // convert earlier date into string object to insert into actual URL string
   const earliestDate = dateFormat(subtractTime)
