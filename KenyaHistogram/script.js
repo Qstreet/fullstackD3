@@ -54,6 +54,7 @@ async function drawDataViz() {
 
 
   const dataJson = await d3.json(jsonData)
+  
   const dataset = dataJson.data
   const countryAccessor = dataset[0].country
 
