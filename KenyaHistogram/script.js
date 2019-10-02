@@ -2,9 +2,11 @@ async function drawDataViz() {
 
   // Create parsers to convert dates in ACLED string format into javascript Date object and back into string as needed.
   const dateParser = d3.timeParse('%Y-%m-%d')
-  const dateFormat = d3.timeFormat('%Y-%m-%d')
+  const formatTime = d3.timeFormat('%Y-%m-%d')
   // pick country by ISO list. 404 happens to be Kenya
   const countryISO = '180'
+  const numberOfDays = 45
+
   // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
 
   // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent single ACLED entry for that criteria
@@ -20,10 +22,10 @@ async function drawDataViz() {
 
   // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
   // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
-  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 14))
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - numberOfDays))
 
   // convert earlier date into string object to insert into actual URL string
-  const earliestDate = dateFormat(subtractTime)
+  const earliestDate = formatTime(subtractTime)
 
   // put latestDate back into string
   // const latestDate = dateFormat(latestDateJS)
@@ -33,7 +35,7 @@ async function drawDataViz() {
   // pick country by ISO list. 404 happens to be Kenya
   // const countryISO = 404
   const dateRange = earliestDate + "|" + latestDate
-  console.log(dateRange);
+  console.log(latestDate);
 
   // call ACLED api. Here we are getting all Riots and Protests in Kenya from the latest entry to 180 days back.
   // it seems that you must put the early date first and recent date second
@@ -72,7 +74,7 @@ async function drawDataViz() {
     width: window.innerWidth * 0.9,
     height: window.innerWidth * 0.5,
     margin: {
-      top: 15,
+      top: 30,
       right: 15,
       bottom: 90,
       left: 60
@@ -140,8 +142,8 @@ async function drawDataViz() {
 
   bounds.append('text')
     .attr('x', dimensions.width / 2)
-    .attr('y', 8)
-    .text(`${countryAccessor}: ${earliestDate} to ${latestDate}`)
+    .attr('y', -10)
+    .text(`${countryAccessor}: ${earliestDate} to ${latestDate} (${numberOfDays} Days)`)
     .attr('class', "dateText")
     .attr('text-anchor', 'middle')
 
