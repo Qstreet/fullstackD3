@@ -5,14 +5,8 @@ async function drawDataViz() {
   const formatTime = d3.timeFormat('%Y-%m-%d')
   // pick country by ISO list. 404 happens to be Kenya
   const countryISO = '180'
-  const numberOfDays = 21
-  
-  d3.select("#idInputField")
-    .on('submit', function() {
-      numberOfDays = +this.value
-      drawDataViz()
-    })
-  
+  const numberOfDays = 45
+
   // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
 
   // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent single ACLED entry for that criteria
@@ -41,6 +35,7 @@ async function drawDataViz() {
   // pick country by ISO list. 404 happens to be Kenya
   // const countryISO = 404
   const dateRange = earliestDate + "|" + latestDate
+  console.log(latestDate);
 
   // call ACLED api. Here we are getting all Riots and Protests in Kenya from the latest entry to 180 days back.
   // it seems that you must put the early date first and recent date second
@@ -61,7 +56,7 @@ async function drawDataViz() {
 
 
   const dataJson = await d3.json(jsonData)
-
+  
   const dataset = dataJson.data
   const countryAccessor = dataset[0].country
 
@@ -152,14 +147,9 @@ async function drawDataViz() {
     .attr('class', "dateText")
     .attr('text-anchor', 'middle')
 
-    // d3.select("#idInputBtn")
-    //   .on('click', function() {
-    //     numberOfDays = +this.value
-    //   })
-
 }
-drawDataViz()
 
+drawDataViz()
 
 
 /*
