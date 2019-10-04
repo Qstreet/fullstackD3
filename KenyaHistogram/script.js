@@ -1,58 +1,55 @@
+// function getNumberDays() {
+//   var verNumOfDays = document.querySelector("#numOfDays")
+//   if (verNumOfDays.value !== 21) {
+//     return verNumOfDays.value
+//   }
+// }
+
+
 async function drawDataViz() {
 
   // Create parsers to convert dates in ACLED string format into javascript Date object and back into string as needed.
   const dateParser = d3.timeParse('%Y-%m-%d')
-  const dateFormat = d3.timeFormat('%Y-%m-%d')
+  const formatTime = d3.timeFormat('%Y-%m-%d')
 
-  // Ping ACLED for date of most recent entry. Here it happens to be 14 Sep 2019
+  var verNumOfDays = document.querySelector("#numOfDays")
+  var inputField = document.querySelector('input[type="submit"]')
 
-  // From this one JSON return (oneRecord), scrape the event_date field as this represents the most recent ACLED entry
-  // use &limit=1 to return only one record
-  const oneRecord = "https://api.acleddata.com/acled/read?terms=accept&limit=1"
+  // var ndays = document.querySelector('#numOfDays').value
 
-  // call ACLED api for one record. I am using d3.js but any RESTful HTTP api will work.
+  let acledMetrics = {
+    countryISO: 108,
+    numberOfDays: 21
+  }
+
+  d3.select(inputField).on('click', function(evt){
+    evt.preventDefault()
+    acledMetrics.numberOfDays = inputField.value
+    return true
+  })
+
+  const oneRecord = `https://api.acleddata.com/acled/read?terms=accept&limit=1&iso=${acledMetrics.countryISO}&event_type=Protests:OR:event_type=Riots:OR:event_type=Violence_against_civilians`
+
   const oneRecordJson = await d3.json(oneRecord)
 
-  // scrape JSON for date and parse string into javascript Date object
   const latestDateJS = dateParser(oneRecordJson.data[0].event_date)
 
-  // subtract duration of days counting back from latest date. Here we use 180 days but it could be any number.
-  // This call will return all data which falls between the most recent ACLED entry and whatever 180 days before that is.
-  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - 180))
+  const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - acledMetrics.numberOfDays))
+  
+  const earliestDate = formatTime(subtractTime)
 
-  // convert earlier date into string object to insert into actual URL string
-  const earliestDate = dateFormat(subtractTime)
-
-  // put latestDate back into string
-  // const latestDate = dateFormat(latestDateJS)
   latestDate = oneRecordJson.data[0].event_date
 
-
-  // pick country by ISO list. 404 happens to be Kenya
-  const countryISO = 12
   const dateRange = earliestDate + "|" + latestDate
-  console.log(dateRange);
 
-  // call ACLED api. Here we are getting all Riots and Protests in Kenya from the latest entry to 180 days back.
-  // it seems that you must put the early date first and recent date second
-
-
-  // const j = `https://api.acleddata.com/acled/read?terms=accept&iso=404&event_type=Protests&event_type=Riots&event_date=${earliestDate}console.log(j);
-
-
-  // this is the actual string which gets sent to ACLED
-
-  // const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
-
-  const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests:OR:event_type=Riots&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
-
-  // const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${countryISO}&event_type=Protests&event_type=Riots&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
+  const jsonData = `https://api.acleddata.com/acled/read?terms=accept&iso=${acledMetrics.countryISO}&event_type=Protests:OR:event_type=Riots:OR:event_type=Violence_against_civilians&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
 
   const accessor01 = d => d.admin1
 
-
   const dataJson = await d3.json(jsonData)
+
   const dataset = dataJson.data
+  const countryAccessor = dataset[0].country
 
   let datasetByAdmin1 = d3.nest()
     .key(function (d) { return d.admin1 })
@@ -60,25 +57,15 @@ async function drawDataViz() {
     .rollup(function (v) { return v.length })
     .entries(dataset)
 
-
-
   // get max value for Y scale
   const maxY = datasetByAdmin1.reduce((max, p) => p.value > max ? p.value : max, datasetByAdmin1[0].value)
 
-  // const maxY = datasetByAdmin1.reduce(function(max, p) {
-  //   if (p.value > max) {
-  //     return p.value
-  //   } else {
-  //     return max, datasetByAdmin1[0].value
-  //   }
-  // })
-
   // for histrogram which should be 2x as wide as tall
   let dimensions = {
-    width: window.innerWidth * 0.95,
+    width: window.innerWidth * 0.9,
     height: window.innerWidth * 0.5,
     margin: {
-      top: 15,
+      top: 30,
       right: 15,
       bottom: 90,
       left: 60
@@ -97,7 +84,6 @@ async function drawDataViz() {
   const bounds = wrapper
     .append('g')
     .style('transform', `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`)
-
 
   const xScale = d3.scaleBand()
     .domain(datasetByAdmin1.map(function (d) { return d.key }))
@@ -122,8 +108,9 @@ async function drawDataViz() {
     .attr('fill', 'steelblue')
 
   // AXES
+  // trick here was to put .ticks(maxY) so the axes adjusts each render. Otherwise it renders 1, 1.5, 2, 2.5 ... 
   const xAxisGenerator = d3.axisBottom().scale(xScale)
-  const yAxisGenerator = d3.axisLeft().scale(yScale)
+  const yAxisGenerator = d3.axisLeft().ticks(maxY).tickFormat(d3.format("d")).scale(yScale)
 
 
   // Rotate X Axes lables
@@ -143,11 +130,25 @@ async function drawDataViz() {
   const yAxis = bounds.append('g')
     .call(yAxisGenerator)
 
+  bounds.append('text')
+    .attr('x', dimensions.width / 2)
+    .attr('y', -10)
+    .text(`${countryAccessor}: ${earliestDate} to ${latestDate} (${acledMetrics.numberOfDays} Days)`)
+    .attr('class', "dateText")
+    .attr('text-anchor', 'middle')
+
+  // var verNumOfDays = document.querySelector("#numOfDays")
+  // var inputField = document.querySelector('input[type="submit"]')
+
+  // d3.select('input[type = "submit"]')
+  //   .on('click', function(){
+  //     const vdays = verNumOfDays.value
+  //     update(vdays)       
+  //   })
+
 }
 
 drawDataViz()
-
-
 /*
 actor1: "Rioters (Kenya)"
 actor2: ""

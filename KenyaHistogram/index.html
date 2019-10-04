@@ -2,14 +2,23 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <script src="https://unpkg.com/d3@^5.12"></script>
-    <title>Histogram</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <script src="https://unpkg.com/d3@^5.12"></script>
+  <title>Histogram</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-       <div id="wrapper"></div>
+  <h1>Protests, Riots, Violence Against Civilians</h1>
+  <p>
+    <form>
+      <label for="numOfDays"> Enter number of days to view:</label>
+      <input type="number" id="numOfDays" name="numOfDays" min="1" max="365" placeholder="Defaults to 30" class="numberField" required>
+      <input type="submit" value="Enter">
+    </form>
+
+
+    <div id="wrapper"></div>
     <script src="./script.js"></script>
 </body>
 

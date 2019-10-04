@@ -11,6 +11,17 @@ async function drawScatterPlot() {
   const yAccessor = d => d.medianAge
   const xAccessor = d => d.gini
 
+  // TOOLTIP
+  // var formatTime = d3.timeFormat("%e %B");
+  let div = d3.select("body").append("div")
+    // .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  // TRANSITION
+  const t = d3.transition()
+    .duration(500)
+    .ease(d3.easeLinear);
+
   // gridlines in x axis function
   function make_x_gridlines() {
     return xAxisGenerator.ticks(7)
@@ -96,16 +107,61 @@ async function drawScatterPlot() {
     .domain(d3.extent(dataset, yAccessor))
     .range(["black", "teal"])
 
+  function drawDotsWave(dataset) {
 
+    const dots = bounds.selectAll('circle')
+      .data(dataset)
+    // .enter()
+    // .append('circle')
+    dots.join('circle')
+      .attr('cx', d => xScale(xAccessor(d)))
+      .attr('cy', d => yScale(yAccessor(d)))
+      .attr('r', 5)
+      .style('fill', d => colorScale(xAccessor(d)))
+      .on("mouseover", function (d) {
+        div
+        .attr("class", "tooltip-big")
+        .transition()
+          .duration(200)
+          .style("opacity", .9);
+        div.html(`${d.country} <br/> Age: ${d.medianAge} <br/> Gini: ${d.gini}`)
+          .style("left", (d3.event.pageX + 8) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (d) {
+        div.transition()
+          .duration(1000)
+          .style("opacity", 0);
+      });
 
-  const dots = bounds.selectAll('circle')
-    .data(dataset)
-    .enter()
-    .append('circle')
-    .attr('cx', d => xScale(xAccessor(d)))
-    .attr('cy', d => yScale(yAccessor(d)))
-    .attr('r', 5)
-    .attr('fill', d => colorScale(xAccessor(d)))
+  }
+
+  setTimeout(() => {
+    drawDotsWave(dataset.slice(0, dataset.length)
+    )
+  }, 1000)
+
+  console.log(dataset.length);
+
+  // function drawDots(dataset, color) {
+  //   const dots = bounds.selectAll('circle').data(dataset)
+
+  //   dots
+  //     // .enter().append('circle')
+  //     // .merge(dots)
+  //     .join('circle')
+  //     .attr('cx', d => xScale(xAccessor(d)))
+  //     .attr('cy', d => yScale(yAccessor(d)))
+  //     .attr('r',5)
+  //     .attr('fill', color)
+
+  // }
+  // drawDots(dataset.slice(0,10), 'darkgrey')
+
+  // setTimeout(() => {
+  //   drawDots(dataset, "cornflowerblue")
+  // },3500)
+
 
   // LABLES
   const xAxisLable = xAxis.append('text')

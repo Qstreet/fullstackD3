@@ -3,6 +3,10 @@ svg {
   border: 1px solid darkslategray;
 }
 
+h1,h2,h3 {
+  text-align: center
+}
+
 .grid line {
   stroke: lightgrey;
   stroke-opacity: 0.7;
@@ -25,4 +29,8 @@ svg {
     stroke: grey;
     stroke-width: 1;
     shape-rendering: crispEdges;
+}
+
+.numberField {
+  width: 8em;
 }
