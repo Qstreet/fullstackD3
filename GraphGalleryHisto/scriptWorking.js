@@ -81,18 +81,14 @@ async function drawDataViz() {
     // src
     // http://bl.ocks.org/phoebebright/raw/3176159/
 
+   
+
     let datasetByAdmin1 = d3.nest()
       .key(function (d) { return d.admin1 })
       .key(function(d) { return d.event_type})
       .sortKeys(d3.ascending)
-      .rollup(function(leaves){return {"length": leaves.length, "event_type": d3.sum(leaves, function(d) {return}) }})
-      // .rollup(function (v) {
-      //   return {
-      //     length: v.length,
-      //     eventType: v.event_type
-      //   }
-      // })
-      .map(dataset)
+      .rollup(function(leaves){return leaves.length})
+      .entries(dataset)
     console.log(datasetByAdmin1);
 
     // let datasetByAdmin1 = d3.nest()
@@ -104,7 +100,7 @@ async function drawDataViz() {
     // get max value for Y scale
     // const maxY = datasetByAdmin1.reduce((max, p) => p.value > max ? p.value : max, datasetByAdmin1[0].value)
 
-    const maxY = datasetByAdmin1.reduce((max, p) => p.values[0].length > max ? p.values[0].length : max, datasetByAdmin1[0].values[0].length)
+    const maxY = datasetByAdmin1.reduce((max, p) => p.values.length > max ? p.values.length : max, datasetByAdmin1.values.length)
 
     xScale.domain(datasetByAdmin1.map(function (d) { return d.key }))
 
@@ -119,16 +115,20 @@ async function drawDataViz() {
       .merge(bars)
       .transition() // and apply changes to all of them
       .duration(1000)
-      .attr('y', function (d) { return yScale(d.values[0].length) })
+      .attr('y', function (d) { return yScale(d.values.length) })
       .attr('x', function (d) { return xScale(d.key) })
       .attr('width', xScale.bandwidth)
-      .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.values[0].length) })
+      .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.values.length) })
       // .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.value) })
       // .attr('fill', 'steelblue')
-    .attr('fill', function(d,i){
-      if (d.values[0].eventType === "Riots") {
+    .attr('fill', function(d) {
+      if (d.values[0].key === "Protests") {
         return "blue"
-      } else if (d.values[0].eventType === "Protests") {
+      } else if (d.values[0].key === "null") {
+        return "green"
+      } else if (d.values[0].key === "Violence against civilians") {
+        return "blue"
+      } else if (d.values[1].key === "Riots") {
         return "green"
       } else { return "gold"}
     })
@@ -169,7 +169,7 @@ async function drawDataViz() {
   }
 
   // Initialize with 20 bins
-  update(30)
+  update(180)
 
   d3.select("#idDaysBack").on('input', function () {
     update(+this.value)
