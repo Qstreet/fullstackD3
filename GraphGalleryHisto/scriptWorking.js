@@ -19,6 +19,9 @@ async function drawDataViz() {
   dimensions.boundedWidth = dimensions.width - dimensions.margin.left - dimensions.margin.right
   dimensions.boundedHeight = dimensions.height - dimensions.margin.top - dimensions.margin.bottom
 
+  const accessorAdmin1 = d => d.admin1
+  const accessorEventDate = d => d.event_date
+
   // DRAW CANVAS
   const wrapper = d3.select("#wrapper")
     .append('svg')
@@ -50,10 +53,7 @@ async function drawDataViz() {
     .attr('x', dimensions.width / 2)
     .attr('y', -10)
 
-
   /**************************************************/
-
-
 
   async function update(daysBack) {
 
@@ -78,43 +78,60 @@ async function drawDataViz() {
     const dataset = dataJson.data
     const countryAccessor = dataset[0].country
 
-    const accessorAdmin1 = d => d.admin1
-    const accessorEventDate = d => d.event_date
+    // src
+    // http://bl.ocks.org/phoebebright/raw/3176159/
 
     let datasetByAdmin1 = d3.nest()
       .key(function (d) { return d.admin1 })
+      .key(function(d) { return d.event_type})
       .sortKeys(d3.ascending)
-      .rollup(function (v) { return v.length })
-      .entries(dataset)
+      .rollup(function(leaves){return {"length": leaves.length, "event_type": d3.sum(leaves, function(d) {return}) }})
+      // .rollup(function (v) {
+      //   return {
+      //     length: v.length,
+      //     eventType: v.event_type
+      //   }
+      // })
+      .map(dataset)
+    console.log(datasetByAdmin1);
+
+    // let datasetByAdmin1 = d3.nest()
+    //   .key(function (d) { return d.admin1 })
+    //   .sortKeys(d3.ascending)
+    //   .rollup(function (v) { return v.length })
+    //   .entries(dataset)
 
     // get max value for Y scale
-    const maxY = datasetByAdmin1.reduce((max, p) => p.value > max ? p.value : max, datasetByAdmin1[0].value)
+    // const maxY = datasetByAdmin1.reduce((max, p) => p.value > max ? p.value : max, datasetByAdmin1[0].value)
+
+    const maxY = datasetByAdmin1.reduce((max, p) => p.values[0].length > max ? p.values[0].length : max, datasetByAdmin1[0].values[0].length)
 
     xScale.domain(datasetByAdmin1.map(function (d) { return d.key }))
 
     yScale.domain([0, maxY])
 
-
     let bars = bounds.selectAll('rect')
       .data(datasetByAdmin1)
-    console.log(datasetByAdmin1);
+    // console.log(datasetByAdmin1);
 
     bars.enter()
       .append('rect')
       .merge(bars)
       .transition() // and apply changes to all of them
       .duration(1000)
-      .attr('y', function (d) { return yScale(d.value) })
+      .attr('y', function (d) { return yScale(d.values[0].length) })
       .attr('x', function (d) { return xScale(d.key) })
       .attr('width', xScale.bandwidth)
-      .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.value) })
-      // .attr('fill', function(d){
-      //   if (d.event_type === "Riots") {
-      //     return "blue"
-      //   } else if (d.event_type === "Protests") {
-      //     return "green"
-      //   } else { return "gold"}
-      // })
+      .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.values[0].length) })
+      // .attr('height', function (d) { return dimensions.boundedHeight - yScale(d.value) })
+      // .attr('fill', 'steelblue')
+    .attr('fill', function(d,i){
+      if (d.values[0].eventType === "Riots") {
+        return "blue"
+      } else if (d.values[0].eventType === "Protests") {
+        return "green"
+      } else { return "gold"}
+    })
 
     bars
       .exit()
@@ -124,7 +141,7 @@ async function drawDataViz() {
     // trick here was to put .ticks(maxY) so the axes adjusts each render. Otherwise it renders 1, 1.5, 2, 2.5 ... 
 
     const xAxisGenerator = d3.axisBottom().scale(xScale)
-    
+
     xAxisGroup.call(xAxisGenerator)
       .selectAll("text")
       .style("text-anchor", "end")
@@ -144,7 +161,7 @@ async function drawDataViz() {
     yAxisGroup
       .call(yAxisGenerator)
 
-  lableGroup
+    lableGroup
       .text(`${countryAccessor}: ${earliestDate} to ${latestDate} (${daysBack} Days)`)
       .attr('class', "dateText")
       .attr('text-anchor', 'middle')
@@ -152,7 +169,7 @@ async function drawDataViz() {
   }
 
   // Initialize with 20 bins
-  update(14)
+  update(30)
 
   d3.select("#idDaysBack").on('input', function () {
     update(+this.value)
@@ -162,6 +179,8 @@ async function drawDataViz() {
   // const countryISO = '180'
   // const numberOfDays = 45
   // for histrogram which should be 2x as wide as tall
+
+  
 }
 
 drawDataViz()
