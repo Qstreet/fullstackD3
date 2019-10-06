@@ -110,6 +110,12 @@ async function drawDataViz() {
       .data(datasetByAdmin1)
     // console.log(datasetByAdmin1);
 
+    let groupie = d3.map(datasetByAdmin1, function(d) {
+      return (d.values).keys
+    })
+
+    console.log(groupie);
+
     bars.enter()
       .append('rect')
       .merge(bars)
@@ -123,13 +129,13 @@ async function drawDataViz() {
       // .attr('fill', 'steelblue')
     .attr('fill', function(d) {
       if (d.values[0].key === "Protests") {
-        return "blue"
+        return "brown"
       } else if (d.values[0].key === "null") {
         return "green"
       } else if (d.values[0].key === "Violence against civilians") {
         return "blue"
-      } else if (d.values[1].key === "Riots") {
-        return "green"
+      } else if (d.values[0].key === "Riots") {
+        return "orange"
       } else { return "gold"}
     })
 
