@@ -80,19 +80,19 @@ async function drawDataViz() {
     const dataset = jsonData.data
 
     // get array of all event_types in set
-    const listEventTypes = dataset.map(function(d) {
+    const listEventTypes = dataset.map(function (d) {
       return d.event_type
     })
     // ES6 Set stores unique values of event_types
     const uniqueEventTypes = [...new Set(listEventTypes)]
 
     // get array of all admin1 in set
-    const listAdmin1s = dataset.map(function(d) {
+    const listAdmin1s = dataset.map(function (d) {
       return d.admin1
     })
     // ES6 Set stores unique values of event_types
     const uniqueAdmin1s = [...new Set(listAdmin1s)]
-    
+
     // Add X axis
     var xAxis = d3.scaleBand()
       .domain(uniqueAdmin1s)
@@ -113,14 +113,55 @@ async function drawDataViz() {
 
     // color palette = one color per subgroup
     const colorBars = d3.scaleOrdinal()
-      .domain(uniqueEventTypes)
+      .domain(listEventTypes)
       .range(['#e41a1c', '#377eb8', '#4daf4a'])
 
     //stack the data? --> stack per subgroup
     const stack = d3.stack()
-      .keys(uniqueEventTypes)
+      .keys(listEventTypes)
 
-    console.log( uniqueEventTypes );
+    // let series = stack(dataset)
+
+    // for (var i = 0; i < series.length; i++) {
+    //   var oneEvent = series[i];
+    //   for (var j = 0; j < oneEvent.length; j++) {
+    //     var twoEvent = oneEvent[j];
+    //     for (var k = 0; k < twoEvent.length; k++) {
+    //       twoEvent[1] = 1
+    //     }
+    //   }
+    // }
+
+    let series = [
+      [[0,2],[0,1],[0,2]],
+      [[1,0],[1,4],[1,3]],
+      [[2,3],[2,2],[2,2]]
+    ]
+
+       console.log(listEventTypes);
+    console.log(series);
+
+    let b = bounds.append("g")
+      .selectAll("g")
+      // Enter in the stack data = loop key per key = group per group
+      .data(series)
+      .enter().append("g")
+      .attr("fill", "red")
+      
+      b.selectAll("rect")
+      // enter a second time = loop subgroup per subgroup to add all rectangles
+      .data(function (d) { return d; })
+      .enter().append("rect")
+      .attr("x", function (d,i) { return xAxis(i); })
+      .attr("y", function (d) { return yAxis(d[0]); })
+      .attr("height", function (d) { return yAxis(d[0]) - yAxis(d[1]); })
+      .attr("width", xAxis.bandwidth())
+
+    // series.forEach( function(d) {
+    //   return d[1] = 1
+    // })
+
+ 
 
 
 
