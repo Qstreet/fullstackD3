@@ -1,8 +1,8 @@
 async function drawDataViz() {
 
   // IMPORT GeoJSON map data  
-  const countryShapes = await d3.json('./ne_50m_admin_0_countries/world-geojson2.json')
-  // const countryShapes = await d3.json('./ne_50m_admin_0_countries/ne_50_admin_0-ATA.json')
+  // const countryShapes = await d3.json('./ne_50m_admin_0_countries/world-geojson2.json')
+  const countryShapes = await d3.json('./ne_50m_admin_0_countries/ne_50m_admin_0_countries_40pct.json')
 
   // ACCESSOR FUNCTIONS
   const countryNameAccessor = d => d.properties['NAME']
@@ -142,20 +142,20 @@ async function drawDataViz() {
     .text(`${d3.format('.1f')(maxChange)}%`)
     .style('text-anchor', 'end')
 
-  navigator.geolocation.getCurrentPosition(myPosition => {
-    const [x, y] = projection([
-      myPosition.coords.longitude,
-      myPosition.coords.latitude
-    ])
+  // navigator.geolocation.getCurrentPosition(myPosition => {
+  //   const [x, y] = projection([
+  //     myPosition.coords.longitude,
+  //     myPosition.coords.latitude
+  //   ])
 
-    const myLocation = bounds.append('circle')
-      .attr('class', 'my-location')
-      .attr('cx', x)
-      .attr('cy', y)
-      .attr('r', 0)
-      .transition().duration(500)
-      .attr('r', 10)
-  })
+  //   const myLocation = bounds.append('circle')
+  //     .attr('class', 'my-location')
+  //     .attr('cx', x)
+  //     .attr('cy', y)
+  //     .attr('r', 0)
+  //     .transition().duration(500)
+  //     .attr('r', 10)
+  // })
 
   countries.on('mouseenter', onMouseEnter)
     .on('mouseleave', onMouseLeave)

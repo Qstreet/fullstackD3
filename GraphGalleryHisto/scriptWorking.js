@@ -4,7 +4,7 @@ async function drawDataViz() {
   const dateParser = d3.timeParse('%Y-%m-%d')
   const formatTime = d3.timeFormat('%Y-%m-%d')
 
-  const countryISO = 404
+  const countryISO = 108
 
   let dimensions = {
     width: window.innerWidth * 0.9,
@@ -157,8 +157,6 @@ async function drawDataViz() {
         return "rotate(-65)"
       })
 
-
-
     const yAxisGenerator = d3.axisLeft()
       .ticks(maxY)
       .tickFormat(d3.format("d"))
@@ -175,7 +173,7 @@ async function drawDataViz() {
   }
 
   // Initialize with 20 bins
-  update(180)
+  update(90)
 
   d3.select("#idDaysBack").on('input', function () {
     update(+this.value)

@@ -18,11 +18,11 @@ async function drawDataViz() {
   // var ndays = document.querySelector('#numOfDays').value
 
   let acledMetrics = {
-    countryISO: 108,
-    numberOfDays: 21
+    countryISO: 404,
+    numberOfDays: 30
   }
 
-  d3.select(inputField).on('click', function(evt){
+  d3.select(inputField).on('click', function (evt) {
     evt.preventDefault()
     acledMetrics.numberOfDays = inputField.value
     return true
@@ -35,7 +35,7 @@ async function drawDataViz() {
   const latestDateJS = dateParser(oneRecordJson.data[0].event_date)
 
   const subtractTime = new Date(latestDateJS.setDate(latestDateJS.getDate() - acledMetrics.numberOfDays))
-  
+
   const earliestDate = formatTime(subtractTime)
 
   latestDate = oneRecordJson.data[0].event_date
