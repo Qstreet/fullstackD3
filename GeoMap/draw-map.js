@@ -42,7 +42,8 @@ async function drawDataViz() {
   //  globe projection might be d3.geoTransverseMercator()
   const sphere = ({ type: 'Sphere' })
   const projection = d3.geoOrthographic().fitWidth(dimensions.boundedWidth, sphere).scale(400)
-  // const projection = d3.geoTransverseMercator().fitWidth(dimensions.boundedWidth, sphere)
+    // const projection = d3.geoTransverseMercator().fitWidth(dimensions.boundedWidth, sphere)
+
   // pathGenerator acts here as a scale converting a GeoJSON obj into a <path> d string
   const pathGenerator = d3.geoPath(projection)
   const [[x0, y0], [x1, y1]] = pathGenerator.bounds(sphere)
@@ -97,7 +98,7 @@ async function drawDataViz() {
     })
 
   const legendGroup = wrapper.append('g')
-    .attr('transform', `translate(${120}, ${dimensions.width < 800 ? dimensions.boundedHeight - 30 : dimensions.boundedHeight * 0.5})`)
+    .attr('transform', `translate(${110}, ${dimensions.width < 800 ? dimensions.boundedHeight - 30 : dimensions.boundedHeight * 0.2})`)
 
   const legendTitle = legendGroup.append('text')
     .attr('y', -23)

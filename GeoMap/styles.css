@@ -13,6 +13,10 @@ body {
     font-size: 16px;
 }
 
+h1,h3 {
+    font-family: Arial, Helvetica, sans-serif 
+    }
+
 .wrapper {
     position: relative;
 }
@@ -80,7 +84,7 @@ circle {
 }
 
 .legend-title {
-    fill: #576574;
+    fill: #32485f;
     text-anchor: middle;
     font-weight: 900;
     font-size: 0.95em;
@@ -89,7 +93,7 @@ circle {
 
 .legend-byline {
     fill: #576574;
-    opacity: 0.6;
+    opacity: 0.8;
     text-anchor: middle;
     font-size: 0.7em;
 }
