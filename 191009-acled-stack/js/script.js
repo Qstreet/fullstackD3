@@ -25,13 +25,13 @@ async function drawDataViz() {
     .append('g')
     .style('transform', `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`)
 
-  const csvURL = "../data/2019-10-09.csv"
+  const csvURL = "./data/2019-10-09.csv"
 
   const csvData = await d3.csv(csvURL)
 
   console.log(csvData);
 
-/*   OLD  */
+  /*   OLD  */
 
   // circles = d3.select('#wrapper')
   //   .selectAll('circle')
@@ -40,7 +40,7 @@ async function drawDataViz() {
   // circles.exit().remove()
   // circles.merge().attr('r', (d) => d)
 
-/*   NEW  */
+  /*   NEW  */
   // circles = d3.select('#wrapper')
   //   .selectAll('circle')
   //   .data([1, 2, 3, 4])
@@ -48,55 +48,52 @@ async function drawDataViz() {
   // circles.join('circle')
   //   .attr('r', (d) => d)
 
-/*   JOIN CYCLE  */
+  /*   JOIN CYCLE  */
 
-const circles = d3.select('#wrapper')
+  const circles = bounds
     .selectAll('circle')
-    .data([1, 2, 3, 4])
+    .data([1, 2, 3, 4, 5, 6, 7])
+    // .data([2, 4, 5, 7,8,11,13])
 
   circles.join(
     enter =>
-      enter.append('circle').attr('fill', 'green'),
+      enter.append('circle').attr('r', (d) => d * 5).attr('fill', 'green'),
     exit => exit.attr('fill', 'brown').call(
       exit =>
         exit
-          .transition(wrapper.transition().duration(750))
+          .transition(wrapper.transition().duration(2000))
           .remove()
     )
   )
 
   /* TOOLTIP  */
 
-  d3.select('body')
-    .append('div')
-    .attr('id', 'tooltip')
-    .attr('style', 'position: absolute; opacity: 0;');
+  // d3.select('#wrapper')
+  //   .append('div')
+  //   .attr('id', 'tooltip')
+  //   .attr('style', 'position: absolute; opacity: 0;');
 
-  d3.select('body')
-    .append('#wrapper')
-    .attr('width', 300)
-    .attr('height', 300);
+  // d3.select('body')
+  //   .append('#wrapper')
+  //   .attr('width', 300)
+  //   .attr('height', 300);
 
-  d3.select('#wrapper')
-    .selectAll('circle')
-    .data(['a', 'b', 'c'])
-    .join('circle')
-    .attr('r', 3)
-    .attr('cy', 5)
-    .attr('cx', (d, i) => i * 15 + 15)
-    .on('mouseover', function (d) {
-      d3.select('#tooltip').transition().duration(200).style('opacity', 1).text(d)
-    })
-    .on('mouseout', function () {
-      d3.select('#tooltip').style('opacity', 0)
-    })
-    .on('mousemove', function () {
-      d3.select('#tooltip').style('left', (d3.event.pageX + 10) + 'px').style('top', (d3.event.pageY + 10) + 'px')
-    })
-
-
-
-
-}
+  // d3.select('#wrapper')
+  //   .selectAll('circle')
+  //   .data(['a', 'b', 'c'])
+  //   .join('circle')
+  //   .attr('r', 3)
+  //   .attr('cy', 5)
+  //   .attr('cx', (d, i) => i * 15 + 15)
+  //   .on('mouseover', function (d) {
+  //     d3.select('#tooltip').transition().duration(200).style('opacity', 1).text(d)
+  //   })
+  //   .on('mouseout', function () {
+  //     d3.select('#tooltip').style('opacity', 0)
+  //   })
+  //   .on('mousemove', function () {
+  //     d3.select('#tooltip').style('left', (d3.event.pageX + 10) + 'px').style('top', (d3.event.pageY + 10) + 'px')
+  //   })
+  }
 
 drawDataViz()
