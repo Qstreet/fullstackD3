@@ -1,75 +1,37 @@
-var data = [
-  { month: 'Jan', A: 20, B: 5, C: 10 },
-  { month: 'Feb', A: 30, B: 10, C: 20 }
-];
+https://observablehq.com/@d3/stacked-bar-chart?collection=@d3/d3-
 
-var xData = ["A", "B", "C"];
+https://stackoverflow.com/questions/45941427/d3-stacked-chart-with-json-data#45944893
 
-var margin = { top: 20, right: 50, bottom: 30, left: 50 },
-  width = 400 - margin.left - margin.right,
-  height = 300 - margin.top - margin.bottom;
+https://stackoverflow.com/questions/51565900/using-json-in-d3v4-stacked-bar-chart?rq=1
 
-var x = d3.scale.ordinal()
-  .rangeRoundBands([0, width], .35);
+https://stackoverflow.com/questions/32298844/d3-js-stacked-bar-chart-from-vertical-to-horizontal?rq=1
 
-var y = d3.scale.linear()
-  .rangeRound([height, 0]);
 
-var color = d3.scale.category20();
 
-var xAxis = d3.svg.axis()
-  .scale(x)
-  .orient("bottom");
+chart = {
+  const svg = d3.create("svg")
+    .attr("viewBox", [0, 0, width, height]);
 
-var svg = d3.select("body").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  svg.append("g")
+    .selectAll("g")
+    .data(series)
+    .join("g")
+    .attr("fill", d => color(d.key))
+    .selectAll("rect")
+    .data(d => d)
+    .join("rect")
+    .attr("x", (d, i) => x(d.data.name))
+    .attr("y", d => y(d[1]))
+    .attr("height", d => y(d[0]) - y(d[1]))
+    .attr("width", x.bandwidth());
 
-var dataIntermediate = xData.map(function (c) {
-  return data.map(function (d) {
-    return { x: d.month, y: d[c] };
-  });
-});
+  svg.append("g")
+    .call(xAxis);
 
-var dataStackLayout = d3.layout.stack()(dataIntermediate);
+  svg.append("g")
+    .call(yAxis);
 
-x.domain(dataStackLayout[0].map(function (d) {
-  return d.x;
-}));
+  return svg.node();
+  }
 
-y.domain([0,
-  d3.max(dataStackLayout[dataStackLayout.length - 1],
-    function (d) { return d.y0 + d.y; })
-])
-  .nice();
-
-var layer = svg.selectAll(".stack")
-  .data(dataStackLayout)
-  .enter().append("g")
-  .attr("class", "stack")
-  .style("fill", function (d, i) {
-    return color(i);
-  });
-
-layer.selectAll("rect")
-  .data(function (d) {
-    return d;
-  })
-  .enter().append("rect")
-  .attr("x", function (d) {
-    return x(d.x);
-  })
-  .attr("y", function (d) {
-    return y(d.y + d.y0);
-  })
-  .attr("height", function (d) {
-    return y(d.y0) - y(d.y + d.y0);
-  })
-  .attr("width", x.rangeBand());
-
-svg.append("g")
-  .attr("class", "axis")
-  .attr("transform", "translate(0," + height + ")")
-  .call(xAxis);
+series = d3.stack().keys(data.columns.slice(1))(data)
