@@ -35,7 +35,8 @@ let isoCode = 4
 // `https://api.acleddata.com/acled/read?terms=accept&iso=${isoCode}&event_type=Violence%20against%20civilians:OR:sub_event_type=Excessive%20force%20against%20protesters:OR:sub_event_type=Suicide%20bomb&event_date=${encodeURIComponent(dateRange)}&event_date_where=BETWEEN`
 
 const baseURL = 
-`https://api.acleddata.com/acled/read.csv?terms=accept&iso=4&event_type=Violence%20against%20civilians:OR:sub_event_type=Excessive%20force%20against%20protesters:OR:sub_event_type=Suicide%20bomb&event_date=${encodeURIComponent(q3Months.m1)}&event_date_where=BETWEEN`
+// `https://api.acleddata.com/acled/read.csv?terms=accept&iso=140&event_type=Violence%20against%20civilians:OR:sub_event_type=Excessive%20force%20against%20protesters:OR:sub_event_type=Suicide%20bomb&event_date=${encodeURIComponent(q3Months.m1)}&event_date_where=BETWEEN`
+`https://api.acleddata.com/acled/read.csv?terms=accept&iso=716&event_type=Violence%20against%20civilians:OR:sub_event_type=Excessive%20force%20against%20protesters:OR:sub_event_type=Suicide%20bomb&event_date=2019-07-02|2019-10-01&event_date_where=BETWEEN`
 
 // const callBase = await d3.json(baseURL)
 
