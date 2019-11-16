@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+
+* { outline: 1px dotted gray;}
+
+.gridContainer {
+  display: grid;
+  grid-template-rows: 20px auto 20px;
+  grid-row-gap: 15px;
+  /* justify-items: center; */
+  justify-content: center;
+  /* align-content: center; */
+  outline: 2px dotted red;
+}
+
+svg {background-color: cornflowerblue;}
+
+  </style>
+    <title>2019-11-16</title>
+</head>
+<body>
+<div class="gridContainer">
+  <header>Header Here</header>
+  <div id="wrapper"></div>
+  <footer>@footer here</footer>
+</div>
+<!-- consider race to get fastest cdn -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+
+<script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=default">
+</script>
+
+<script>
+
+  async function drawLineChart() {
+
+    const dataset = await d3.json("https://api.acleddata.com/acled/read?terms=accept");
+    console.log(dataset.data);
+
+    // var url = new URL("https://api.acleddata.com/acled/read?terms=accept");
+
+  const getOffsetLocalToUTC = (new Date().getTimezoneOffset()) * 60 * 1000  // 300
+  const dateParser = d3.utcParse("%Y-%m-%d")
+  const accessor_country = function(d) { return d.country }
+  const accessor_event_date = function(d) { return dateParser(d.event_date) }
+  const accessor_event_type = function(d) { return d.event_type }
+  const accessor_fatalities = function(d) { return d.fatalities }
+  const accessor_latitude = function(d) { return d.latitude }
+  const accessor_longitude = function(d) { return d.longitude }
+  const accessor_notes = function(d) { return d.notes }
+   // return UNIX string in seconds NOT ms
+  const accessor_timestamp = function(d) { return d.timestamp }
+  const getLocalTimestampAsInteger = parseInt(accessor_timestamp(dataset.data[0]));
+
+  // mult by 1000 to convert UNIX seconds to ms
+  const getUTCtimestampAsInteger = (getLocalTimestampAsInteger * 1000) + getOffsetLocalToUTC;
+
+
+  var evtTime = (dataset.data[0].timestamp)
+  console.log("64",new Date().getTime());
+
+  var t = new Date(getUTCtimestampAsInteger)
+    console.log(t.toUTCString());
+
+
+// 2. Create chart dimensions
+    let dimensions = {
+      width: window.innerWidth * 0.9,
+      height: 400,
+      margin: {
+        top: 15,
+        right: 15,
+        bottom: 40,
+        left: 60,
+      },
+    }
+    dimensions.boundedWidth = dimensions.width
+      - dimensions.margin.left
+      - dimensions.margin.right
+    dimensions.boundedHeight = dimensions.height
+      - dimensions.margin.top
+      - dimensions.margin.bottom
+
+  // 3. Draw canvas
+
+    const wrapper = d3.select("#wrapper")
+      .append("svg")
+      .attr("width", dimensions.width)
+      .attr("height", dimensions.height)
+
+    const bounds = wrapper.append("g")
+      .style("transform", `translate(${
+        dimensions.margin.left
+        }px, ${
+        dimensions.margin.top
+        }px)`)
+
+  // 4. Create scales
+
+  //   const yScale = d3.scaleLinear()
+  //     .domain(d3.extent(dataset, yAccessor))
+  //     .range([dimensions.boundedHeight, 0])
+
+  //   const freezingTemperaturePlacement = yScale(32)
+  //   const freezingTemperatures = bounds.append("rect")
+  //     .attr("x", 0)
+  //     .attr("width", dimensions.boundedWidth)
+  //     .attr("y", freezingTemperaturePlacement)
+  //     .attr("height", dimensions.boundedHeight
+  //       - freezingTemperaturePlacement)
+  //     .attr("fill", "#e0f3f3")
+
+  //   const xScale = d3.scaleTime()
+  //     .domain(d3.extent(dataset, xAccessor))
+  //     .range([0, dimensions.boundedWidth])
+
+  //   // 5. Draw data
+
+  //   const lineGenerator = d3.line()
+  //     .x(d => xScale(xAccessor(d)))
+  //     .y(d => yScale(yAccessor(d)))
+
+  //   const line = bounds.append("path")
+  //     .attr("d", lineGenerator(dataset))
+  //     .attr("fill", "none")
+  //     .attr("stroke", "#af9358")
+  //     .attr("stroke-width", 2)
+
+  //   // 6. Draw peripherals
+
+  //   const yAxisGenerator = d3.axisLeft()
+  //     .scale(yScale)
+
+  //   const yAxis = bounds.append("g")
+  //     .call(yAxisGenerator)
+
+  //   const xAxisGenerator = d3.axisBottom()
+  //     .scale(xScale)
+
+  //   const xAxis = bounds.append("g")
+  //     .call(xAxisGenerator)
+  //     .style("transform", `translateY(${
+  //       dimensions.boundedHeight
+  //       }px)`)
+  
+  }
+  drawLineChart();
+
+
+  // {
+  //   const svg = d3.create("svg")
+  //     .attr("width", width)
+  //     .attr("height", 33)
+  //     .attr("viewBox", `0 -20 ${width} 33`);
+
+  //   while (true) {
+  //     const t = svg.transition()
+  //       .duration(750);
+
+  //     svg.selectAll("text")
+  //       .data(randomLetters(), d => d)
+  //       .join(
+  //         enter => enter.append("text")
+  //           .attr("fill", "green")
+  //           .attr("x", (d, i) => i * 16)
+  //           .attr("y", -30)
+  //           .text(d => d)
+  //           .call(enter => enter.transition(t)
+  //             .attr("y", 0)),
+  //         update => update
+  //           .attr("fill", "black")
+  //           .attr("y", 0)
+  //           .call(update => update.transition(t)
+  //             .attr("x", (d, i) => i * 16)),
+  //         exit => exit
+  //           .attr("fill", "brown")
+  //           .call(exit => exit.transition(t)
+  //             .attr("y", 30)
+  //             .remove())
+  //       );
+
+  //     yield svg.node();
+  //     await Promises.tick(2500);
+  //   }
+  // }
+
+  // d3.dsv(",", "test.csv", function (d) {
+  //   return {
+  //     year: new Date(+d.Year, 0, 1), // convert "Year" column to Date
+  //     make: d.Make,
+  //     model: d.Model,
+  //     length: +d.Length // convert "Length" column to number
+  //   };
+  // }).then(function (data) {
+  //   console.log(data);
+  // });
+
+</script>
+
+</body>
+</html>
