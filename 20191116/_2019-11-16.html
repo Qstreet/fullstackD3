@@ -39,14 +39,18 @@ svg {background-color: cornflowerblue;}
 <script>
 
   async function drawLineChart() {
+// BRING IN DATA
 
-    const dataset = await d3.json("https://api.acleddata.com/acled/read?terms=accept");
-    console.log(dataset.data);
+    const jsonData = await d3.json("https://api.acleddata.com/acled/read?terms=accept&iso=404&event_date=2019-10-01|2019-11-16&event_date_where=BETWEEN");
 
     // var url = new URL("https://api.acleddata.com/acled/read?terms=accept");
 
   const getOffsetLocalToUTC = (new Date().getTimezoneOffset()) * 60 * 1000  // 300
-  const dateParser = d3.utcParse("%Y-%m-%d")
+  // const dateParser = d3.utcParse("%Y-%m-%d")
+  const dateParser = d3.timeParse("%Y-%m-%d")
+  var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const dataset = jsonData.data
+  console.log(dataset);
   const accessor_country = function(d) { return d.country }
   const accessor_event_date = function(d) { return dateParser(d.event_date) }
   const accessor_event_type = function(d) { return d.event_type }
@@ -56,17 +60,52 @@ svg {background-color: cornflowerblue;}
   const accessor_notes = function(d) { return d.notes }
    // return UNIX string in seconds NOT ms
   const accessor_timestamp = function(d) { return d.timestamp }
-  const getLocalTimestampAsInteger = parseInt(accessor_timestamp(dataset.data[0]));
+  const getLocalTimestampAsInteger = parseInt(accessor_timestamp(dataset[0]));
 
   // mult by 1000 to convert UNIX seconds to ms
   const getUTCtimestampAsInteger = (getLocalTimestampAsInteger * 1000) + getOffsetLocalToUTC;
 
+   // FUNCTIONS
+    
+    function groupBy(objectArray, property) {
+      return objectArray.reduce(function (acc, obj, idx) {
+        var key = obj[property];
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(obj);
+        // console.log('acc',acc);
+        return acc;
+      }, {});
+    }
 
-  var evtTime = (dataset.data[0].timestamp)
-  console.log("64",new Date().getTime());
+    var grouped_event_date = groupBy(dataset, 'event_date');
+    // const accessor_events_per_date = function(d) { return d.length}
 
-  var t = new Date(getUTCtimestampAsInteger)
-    console.log(t.toUTCString());
+
+    console.log("84",grouped_event_date);
+
+    function getCountMostEventsADay() {
+    var mostEventsDay = 0;
+    for (const date in grouped_event_date) {
+      if ((grouped_event_date[date].length) > mostEventsDay) {
+        mostEventsDay = grouped_event_date[date].length
+      }
+    } return mostEventsDay;
+  }
+
+  console.log(getCountMostEventsADay());
+
+  function getDaysPerDate(date) {
+    var days = grouped_event_date[date].length
+    return days
+  }
+
+  // var evtTime = (dataset[0].timestamp)
+  // console.log("64",new Date().getTime());
+
+  // var t = new Date(getUTCtimestampAsInteger)
+  //   console.log(t.toUTCString());
 
 
 // 2. Create chart dimensions
@@ -95,17 +134,44 @@ svg {background-color: cornflowerblue;}
       .attr("height", dimensions.height)
 
     const bounds = wrapper.append("g")
-      .style("transform", `translate(${
-        dimensions.margin.left
-        }px, ${
-        dimensions.margin.top
-        }px)`)
+      // .style("transform", `translate(${
+      //   dimensions.margin.left
+      //   }px, ${
+      //   dimensions.margin.top
+      //   }px)`)
+      .style("transform", "translate(" + dimensions.margin.left + "px," + dimensions.margin.top + "px)")
 
   // 4. Create scales
 
-  //   const yScale = d3.scaleLinear()
-  //     .domain(d3.extent(dataset, yAccessor))
-  //     .range([dimensions.boundedHeight, 0])
+
+
+
+      const xScale = d3.scaleTime()
+      .domain(d3.extent(dataset, accessor_event_date))
+      .range([0, dimensions.boundedWidth])
+
+      const yScale = d3.scaleLinear()
+      .domain([0, getCountMostEventsADay()])
+      .range([dimensions.boundedHeight, 0])
+
+      const xAxisGenerator = d3.axisBottom()
+      .scale(xScale)
+
+    const xAxis = bounds.append("g")
+      .attr("class", "x-axis")
+      .style("transform", `translateY(${dimensions.boundedHeight}px)`)
+      .call(xAxisGenerator)
+
+      const yAxisGenerator = d3.axisLeft()
+      .scale(yScale)
+
+    const yAxis = bounds.append("g")
+      .attr("class", "y-axis")
+      .style("transform", `translateX(0px)`)
+      .call(yAxisGenerator)
+
+
+
 
   //   const freezingTemperaturePlacement = yScale(32)
   //   const freezingTemperatures = bounds.append("rect")
