@@ -22,7 +22,7 @@ body {
   grid-template-rows: 1fr;
   /* grid-row-gap: 15px; */
   justify-content: center;
-  outline: 2px dotted red;
+  outline: 1px dotted gray;
 }
 
 
@@ -134,12 +134,11 @@ circle {
   async function drawLineChart() {
 
     // BRING IN DATA
+
     const countryShapes = await d3.json('./geodata/world-geojson2.json')
     const countryPctInc = await d3.csv('./geodata/TwoWeekPctIncrease.csv')
 
-    console.log(countryPctInc);
-
-    let dimensions = {
+     let dimensions = {
       width: window.innerWidth * 0.95,
       margin: {
         top: 10,
@@ -160,28 +159,22 @@ circle {
     const pctMax = d3.max(countryPctInc, d => +d.pctIncrease)
     const colorScale = d3.scaleLinear()
         .domain([100,pctMax])
-        .range(['pink','red'])
+        .range(['white','steelblue'])
     const accessor_countryName = d => d.properties.NAME
 
-    const projection = d3.geoEquirectangular()
-    // const projection = d3.geoOrthographic()
+    // const projection = d3.geoEquirectangular()
+    const projection = d3.geoOrthographic()
         // const projection = d3.geoEqualEarth()
-        .fitWidth(dimensions.boundedWidth, sphere)
+    .fitWidth(dimensions.boundedWidth, sphere)
     
     const pathGenerator = d3.geoPath(projection);
 
-    console.log(countryShapes.features[0].properties.NAME);
-    
-    var getColor = function(d){
-      console.log("176", d.properties.NAME);
-      countryPctInc.filter(function(v){ return v.country === d.properties.NAME }) 
-    }
-    
-    // var getColor = function(d){
-    //   return countryPctInc.filter(v){ return d.properties.NAME === v.country; }
-    // }
+    console.log(countryShapes.features);
 
-    
+// var getPctIncreaseValue = function(d){
+//   console.log(d.properties.NAME);
+//   return d.properties.NAME;
+// }
 
     const [[x0,y0],[x1,y1]] = pathGenerator.bounds(sphere);
     const graticuleJson = d3.geoGraticule10();
@@ -213,7 +206,7 @@ circle {
         .enter().append('path')
           .attr('class', 'country')
           .attr('d', pathGenerator)
-          .attr('fill', colorScale(getColor))
+          .attr('fill', colorScale(getPctIncreaseValue)||'white')
           .attr('stroke', 'darkgray')
           .attr('stroke-width', '1px')
           
