@@ -172,7 +172,11 @@ circle {
 
     console.log(countryShapes.features[0].properties.NAME);
     
-    var getColor;
+    var getColor = function(d){
+      console.log("176", d.properties.NAME);
+      countryPctInc.filter(function(v){ return v.country === d.properties.NAME }) 
+    }
+    
     // var getColor = function(d){
     //   return countryPctInc.filter(v){ return d.properties.NAME === v.country; }
     // }
