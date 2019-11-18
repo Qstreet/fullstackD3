@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+
+body {
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* align-items: center; */
+    padding: 1em;
+    letter-spacing: -0.011em;
+    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: 'Inter var', sans-serif; */
+    font-size: 16px;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-rows: 1fr;
+  /* grid-row-gap: 15px; */
+  justify-content: center;
+  outline: 1px dotted gray;
+}
+
+#idTitle{
+  font-size: 2em;
+}
+
+
+#wrapper {
+    position: relative;
+}
+
+.earth {
+    fill: #e2f1f1;
+    stroke: none;
+}
+
+.graticule {
+    stroke: #cadddd;
+    fill: none;
+}
+
+.country:hover {
+    fill: cornflowerblue;
+}
+
+circle {
+    pointer-events: none;
+}
+
+.tooltip {
+    opacity: 0;
+    position: absolute;
+    top: -12px;
+    left: 0;
+    padding: 0.6em 1em;
+    background: #fff;
+    text-align: center;
+    border: 1px solid #ddd;
+    z-index: 10;
+    transition: all 0.2s ease-out;
+    pointer-events: none;
+}
+
+.tooltip:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform: translate(-50%, 50%) rotate(45deg);
+    transform-origin: center center;
+    z-index: 10;
+}
+
+.tooltip-country {
+    margin-bottom: 0.2em;
+    font-weight: 600;
+}
+
+.tooltip-value {
+    font-size: 0.8em;
+}
+
+.legend-title {
+    fill: #576574;
+    text-anchor: middle;
+    font-weight: 900;
+    font-size: 0.95em;
+    letter-spacing: 0.01em;
+}
+
+.legend-byline {
+    fill: #576574;
+    opacity: 0.6;
+    text-anchor: middle;
+    font-size: 0.7em;
+}
+
+.legend-value {
+    fill: #576574;
+    dominant-baseline: middle;
+    font-size: 0.8em;
+}
+
+.legend-value:first-of-type {
+    text-anchor: end;
+}
+
+  </style>
+    <title>2019-11-17</title>
+</head>
+<body>
+
+<div class="gridContainer">
+  <header id='idHead'><span id='idTitle'>Two week snapshot: riots and violence against civilians</span></header>
+  <div id="wrapper"></div>
+  <footer>UNCLASSIFIED</footer>
+
+</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+
+<script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=default">
+</script>
+
+
+<script>
+  async function drawLineChart() {
+
+    const countryShapes = await d3.json('./geodata/world-geojson2.json')
+    const countryPctInc = await d3.csv('./geodata/FourteenDayAvg.csv')
+
+
+  const getPctIncreaseValue = function(name){
+    var countryMatch = countryPctInc.filter(function(item, idx, array){
+      return item.iso3 === name
+    })
+    if (countryMatch[0] !== undefined) {
+        return (parseInt(countryMatch[0].pctIncrease))
+      } else {
+        return
+      }
+    }
+
+     let dimensions = {
+      width: window.innerWidth * 0.95,
+      margin: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10,
+      },
+    }
+    dimensions.boundedWidth = dimensions.width
+      - dimensions.margin.left
+      - dimensions.margin.right
+
+    // ACCESSOR FUNCTIONS
+    const accessor_country_name = d => d.properties["NAME"];
+    const accessor_country_ID   = d => d.properties["ADM0_A3_IS"];
+    const sphere = ({type: "Sphere"});
+    const accessor_pctIncrease = d => +d.pctIncrease
+    const pctMax = d3.max(countryPctInc, d => +d.pctIncrease)
+    const colorScale = d3.scaleLinear()
+        .domain([50, pctMax])
+        .range(['white','red'])
+    const accessor_countryName = d => d.properties.NAME
+
+    // const projection = d3.geoEquirectangular()
+    const projection = d3.geoOrthographic()
+        // const projection = d3.geoEqualEarth()
+    .fitWidth(dimensions.boundedWidth, sphere)
+    
+    const pathGenerator = d3.geoPath(projection);
+
+    console.log(countryShapes.features);
+
+
+
+    const [[x0,y0],[x1,y1]] = pathGenerator.bounds(sphere);
+    const graticuleJson = d3.geoGraticule10();
+
+    dimensions.boundedHeight = y1;
+    dimensions.height = dimensions.boundedHeight
+        + dimensions.margin.top
+        + dimensions.margin.bottom
+
+  // Draw canvas
+    const wrapper = d3.select("#wrapper")
+      .append("svg")
+      .attr("width", dimensions.width)
+      .attr("height", dimensions.height)
+
+    const bounds = wrapper.append("g")
+      .style("transform", "translate(" + dimensions.margin.left + "px," + dimensions.margin.top + "px)")
+
+    const earth = bounds.append('path')
+        .attr('class','earth')
+        .attr('d', pathGenerator(sphere))
+
+    const graticule = bounds.append('path')
+        .attr('class', 'graticule')
+        .attr('d', pathGenerator(graticuleJson))
+      
+    const countries = bounds.selectAll('.country')
+        .data(countryShapes.features)
+        .enter().append('path')
+          .attr('class', 'country')
+          .attr('d', pathGenerator)
+          .attr('fill', function(d) { return colorScale(getPctIncreaseValue(d.properties.SOV_A3)) || "white"})
+          .attr('stroke', 'darkgray')
+          .attr('stroke-width', '1px')
+          
+          
+    // INTERACTTIONS
+    
+    countries.on("mouseenter", onMouseEnter)
+      .on("mouseleave", onMouseLeave)
+
+    const tooltip = d3.select("#tooltip")
+
+    function onMouseEnter(datum) {
+      tooltip.style("opacity", 1)
+
+      // const metricValue = metricDataByCountry[countryIdAccessor(datum)]
+      const metricValue = 123
+
+      tooltip.select("#country")
+        .text(accessor_country_name(datum))
+
+      tooltip.select("#value")
+        .text(`${d3.format(",.2f")(metricValue || 0)}%`)
+
+      const [centerX, centerY] = pathGenerator.centroid(datum)
+
+      const x = centerX + dimensions.margin.left
+      const y = centerY + dimensions.margin.top
+
+      tooltip.style("transform", `translate(`
+        + `calc( -50% + ${x}px),`
+        + `calc(-100% + ${y}px)`
+        + `)`)
+    }
+
+    function onMouseLeave() {
+      tooltip.style("opacity", 0)
+    }
+
+    document.addEventListener('click',fnChangeMap,false)
+     
+  }
+  drawLineChart();
+
+</script>
+
+</body>
+</html>
