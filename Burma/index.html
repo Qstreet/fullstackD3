@@ -30,16 +30,21 @@
         const parseDate = d3.timeParse("%Y-%m-%d");
         var t = d3.transition().duration(750);
 
-      var w = 400;
-      var h = 700;
+        var w = 400;
+        var h = 700;
 
-      var svg = d3
-        .select("div#container")
-        .append("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 " + w + " " + h)
-        .style("background", "#c9e8fd")
-        .classed("svg-content", true);
+        var svg = d3
+          .select("div#container")
+          .append("svg")
+          .attr("preserveAspectRatio", "xMinYMin meet")
+          .attr("viewBox", "0 0 " + w + " " + h)
+          .style("background", "#c9e8fd")
+          .call(
+            d3.zoom().on("zoom", function() {
+              svg.attr("transform", d3.event.transform);
+            })
+          )
+          .append("g");
 
         var projection = d3
           .geoMercator()
@@ -86,7 +91,6 @@
               }
             });
 
-          var arrayCentroids = [];
           var map = svg.append("g");
           map
             .selectAll("text")
