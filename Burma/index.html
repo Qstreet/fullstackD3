@@ -30,35 +30,24 @@
         const parseDate = d3.timeParse("%Y-%m-%d");
         var t = d3.transition().duration(750);
 
-        // DIMENSIONS
-        const width = 300;
-        const height = 700;
-        const adj = 0;
+      var w = 400;
+      var h = 700;
+
+      var svg = d3
+        .select("div#container")
+        .append("svg")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 " + w + " " + h)
+        .style("background", "#c9e8fd")
+        .classed("svg-content", true);
 
         var projection = d3
           .geoMercator()
-          .translate([width / 2, height / 2])
+          .translate([w / 2, h / 2])
           .scale([1000])
           .center([97, 22]);
 
         var path = d3.geoPath(projection);
-
-        const svg = d3
-          .select("div#container")
-          .append("svg")
-          .attr("preserveAspectRatio", "xMidYMid meet")
-          .attr(
-            "viewBox",
-            "-" +
-              adj +
-              " -" +
-              adj +
-              " " +
-              (width + adj * 1) +
-              " " +
-              (height + adj * 3)
-          );
-        // .classed("svg-content", true);
 
         // GET DATA
         d3.csv(watch35csv).then(function(csvData) {
