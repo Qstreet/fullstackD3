@@ -10,6 +10,9 @@
       svg {
         padding: 5px;
         margin:  5px;}
+      .tsText { font-size: 0.2rem;
+
+      }
     </style>
     <title>35 Townships</title>
   </head>
@@ -54,7 +57,7 @@
           // .classed("svg-content", true);
 
 // //Define what to do when dragging
-// 			var dragging = function(d) {
+// var dragging = function(d) {
 
 // //Log out d3.event, so you can see all the goodies inside
 // //console.log(d3.event);
@@ -130,10 +133,27 @@
                   return '#aaa';
                 }
               });
-            }
+            
 
+          var map = svg.append('g');
+          map.selectAll('text')
+            .data(mapData.features)
+            .enter()
+            .append('text')
+            .attr('class','tsText')
+            .attr('x', function(d){
+              return path.centroid(d)[0];
+            })
+            .attr('y', function(d){
+              return path.centroid(d)[1];
+            })
+            .text(function(d){
+              if (d.properties.watch35 === '1') {
+              return d.properties.TS;
+              }
+            })
 
- 
+          }
 
 
       })(); // close IIFE
