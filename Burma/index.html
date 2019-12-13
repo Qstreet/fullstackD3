@@ -77,6 +77,41 @@
         });
 
         function draw(mapData) {
+
+            // create a tooltip
+  var Tooltip = d3.select("#container")
+    .append("div")
+    .style("opacity", 0)
+    // .attr("class", "tooltip")
+    // .style("background-color", "white")
+    // .style("border", "solid")
+    // .style("border-width", "1px")
+    // .style("border-radius", "1px")
+    // .style("padding", "1px")
+
+  // Three function that change the tooltip when user hover / move / leave a cell
+  var mouseover = function(d) {
+    Tooltip
+      .style("opacity", 0)
+    d3.select(this)
+      .style("stroke", "gray")
+      .style("opacity", 1)
+  }
+  var mousemove = function(d) {
+    Tooltip
+      .html("The exact value of<br>this cell is: " + d.value)
+      .style("left", (d3.mouse(this)[0]+70) + "px")
+      .style("top", (d3.mouse(this)[1]) + "px")
+  }
+  var mouseleave = function(d) {
+    Tooltip
+      .style("opacity", 0)
+    d3.select(this)
+      .style("stroke", "none")
+      .style("opacity", 1)
+  }
+
+
           svg
             .selectAll("path")
             .data(mapData.features)
@@ -89,7 +124,10 @@
               } else {
                 return "#aaa";
               }
-            });
+            })
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
 
           var map = svg.append("g");
           map
@@ -109,6 +147,9 @@
                 return d.properties.TS;
               }
             });
+
+
+
         }
       })(); // close IIFE
     </script>
