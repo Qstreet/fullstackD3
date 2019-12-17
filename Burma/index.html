@@ -94,7 +94,7 @@
     Tooltip
       .style("opacity", 0)
     d3.select(this)
-      .style("stroke", "gray")
+      // .style("stroke", "gray")
       .style("opacity", 1)
   }
   var mousemove = function(d) {
@@ -120,7 +120,7 @@
             .attr("d", path)
             .attr("fill", function(d) {
               if (d.properties.watch35 === "1") {
-                return "#224a6b";
+                return "#fff";
               } else {
                 return "#aaa";
               }
